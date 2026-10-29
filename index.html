@@ -3,8 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Tell browsers this page is light-mode only. Prevents OS/browser dark mode
-       from inverting backgrounds and distorting SVG map illustrations. -->
   <meta name="color-scheme" content="only light">
   <title>When the cat's away</title>
   
@@ -35,25 +33,24 @@
       padding: 0;
     }
 
-    /* ELIMINATE IFRAME SCROLLBAR AND PREVENT GAPS */
+    /* ELIMINATE IFRAME SCROLLBAR */
     html {
       background: #ffffff !important;
       color: var(--color-text-dark) !important;
       overflow: hidden !important;
       width: 100% !important;
-      height: 100% !important;
+      height: auto !important;
     }
 
-    /* Body fits the full iframe height cleanly with breathing room for the drop shadow */
     body {
       font-family: var(--font-main);
       background: #ffffff !important;
       color: var(--color-text-dark) !important;
       margin: 0 !important;
-      padding: 8px 12px 12px 12px !important;
+      padding: 6px 10px 10px 10px !important;
       width: 100% !important;
-      height: 100% !important;
-      min-height: 100% !important;
+      height: auto !important;
+      min-height: 0 !important;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -79,12 +76,11 @@
       outline-offset: 2px;
     }
 
-    /* CONTAINER - Fills full iframe height so no bottom gap is created */
+    /* CONTAINER - Locked 16/9 ratio ensures map pins never drift */
     .interactive-container {
       width: 100%;
       max-width: 1120px;
-      height: calc(100vh - 20px);
-      min-height: 100%;
+      aspect-ratio: 16 / 9;
       margin: 0 auto;
       background: #ffffff;
       border-radius: 8px;
@@ -94,7 +90,7 @@
       transform: translateZ(0);
       container-type: inline-size;
       container-name: app;
-      flex: 1 1 auto;
+      flex-shrink: 0;
     }
 
     /* ========================================================= */
@@ -257,7 +253,7 @@
       width: 100%;
       height: 100%;
       display: block;
-      object-fit: contain;
+      object-fit: fill; /* fill keeps exact mathematical alignment with % pin coordinates */
     }
 
     .map-highlights {
@@ -816,7 +812,7 @@
       <img src="Resources/PastedVector-16.svg" id="main-world-map" alt="World Map" class="world-map-svg">
 
       <!-- HOVER HIGHLIGHTS -->
-      <svg class="map-highlights" viewBox="0 0 1112.8 498.4" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <svg class="map-highlights" viewBox="0 0 1112.8 498.4" preserveAspectRatio="none" aria-hidden="true">
         <defs>
           <filter id="tint-southchina" color-interpolation-filters="sRGB">
             <feFlood flood-color="#475ED1" result="c"/>
@@ -1016,6 +1012,30 @@
       if (srStatus) srStatus.textContent = message;
     }
 
+    // Dynamic height reporter for parent Moodle iframe
+    function reportHeightToParent() {
+      const app = document.getElementById('interactive-app');
+      if (!app) return;
+      const exactHeight = Math.ceil(app.getBoundingClientRect().height) + 16;
+
+      const ltiMsg = { subject: 'lti.frameResize', height: exactHeight, frameHeight: exactHeight };
+      window.parent.postMessage(ltiMsg, '*');
+      window.parent.postMessage(JSON.stringify(ltiMsg), '*');
+
+      window.parent.postMessage({ type: 'resize', height: exactHeight, value: exactHeight, frameHeight: exactHeight }, '*');
+      window.parent.postMessage({ type: 'setHeight', height: exactHeight }, '*');
+      window.parent.postMessage({ event: 'resize', height: exactHeight }, '*');
+      window.parent.postMessage('resize::' + exactHeight, '*');
+      window.parent.postMessage({ 'height': exactHeight }, '*');
+
+      if (window.parentIFrame && typeof window.parentIFrame.size === 'function') {
+        window.parentIFrame.size(exactHeight);
+      }
+      if (window.parent && window.parent.iFrameResizer && typeof window.parent.iFrameResizer.resize === 'function') {
+        window.parent.iFrameResizer.resize();
+      }
+    }
+
     function tangentPoints(px, py, cx, cy, r) {
       const dx = cx - px, dy = cy - py;
       const d = Math.hypot(dx, dy);
@@ -1118,13 +1138,21 @@
     }
 
     const resizeObserver = new ResizeObserver(() => {
+      reportHeightToParent();
       if (contentModal.classList.contains('active') && activePin) {
         alignSpotlightToPin(activePin);
       }
     });
     resizeObserver.observe(document.getElementById('interactive-app'));
 
+    window.addEventListener('load', () => {
+      reportHeightToParent();
+      setTimeout(reportHeightToParent, 200);
+      setTimeout(reportHeightToParent, 600);
+    });
+
     window.addEventListener('resize', () => {
+      reportHeightToParent();
       if (contentModal.classList.contains('active') && activePin) alignSpotlightToPin(activePin);
     });
 
@@ -1255,8 +1283,6 @@
     }
 
     document.getElementById('btn-reset').addEventListener('click', resetToCover);
-
-    // Both X buttons return cleanly to the cover screen
     document.getElementById('btn-exit').addEventListener('click', resetToCover);
     document.getElementById('completion-exit-btn').addEventListener('click', resetToCover);
 
