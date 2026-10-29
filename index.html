@@ -83,8 +83,8 @@
     .interactive-container {
       width: 100%;
       max-width: 1120px;
-      height: 100%;
-      max-height: calc(100vh - 20px);
+      height: calc(100vh - 20px);
+      min-height: 100%;
       margin: 0 auto;
       background: #ffffff;
       border-radius: 8px;
@@ -1016,31 +1016,6 @@
       if (srStatus) srStatus.textContent = message;
     }
 
-    // Dynamic height reporter for parent Moodle iframe
-    function reportHeightToParent() {
-      const app = document.getElementById('interactive-app');
-      if (!app) return;
-      const exactHeight = Math.ceil(app.getBoundingClientRect().height) + 20;
-
-      // Standard Moodle / LTI frameResize message
-      const ltiMsg = { subject: 'lti.frameResize', height: exactHeight, frameHeight: exactHeight };
-      window.parent.postMessage(ltiMsg, '*');
-      window.parent.postMessage(JSON.stringify(ltiMsg), '*');
-
-      window.parent.postMessage({ type: 'resize', height: exactHeight, value: exactHeight, frameHeight: exactHeight }, '*');
-      window.parent.postMessage({ type: 'setHeight', height: exactHeight }, '*');
-      window.parent.postMessage({ event: 'resize', height: exactHeight }, '*');
-      window.parent.postMessage('resize::' + exactHeight, '*');
-      window.parent.postMessage({ 'height': exactHeight }, '*');
-
-      if (window.parentIFrame && typeof window.parentIFrame.size === 'function') {
-        window.parentIFrame.size(exactHeight);
-      }
-      if (window.parent && window.parent.iFrameResizer && typeof window.parent.iFrameResizer.resize === 'function') {
-        window.parent.iFrameResizer.resize();
-      }
-    }
-
     function tangentPoints(px, py, cx, cy, r) {
       const dx = cx - px, dy = cy - py;
       const d = Math.hypot(dx, dy);
@@ -1143,21 +1118,13 @@
     }
 
     const resizeObserver = new ResizeObserver(() => {
-      reportHeightToParent();
       if (contentModal.classList.contains('active') && activePin) {
         alignSpotlightToPin(activePin);
       }
     });
     resizeObserver.observe(document.getElementById('interactive-app'));
 
-    window.addEventListener('load', () => {
-      reportHeightToParent();
-      setTimeout(reportHeightToParent, 200);
-      setTimeout(reportHeightToParent, 600);
-    });
-
     window.addEventListener('resize', () => {
-      reportHeightToParent();
       if (contentModal.classList.contains('active') && activePin) alignSpotlightToPin(activePin);
     });
 
