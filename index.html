@@ -41,19 +41,19 @@
       color: var(--color-text-dark) !important;
       overflow: hidden !important;
       width: 100% !important;
-      height: auto !important;
+      height: 100% !important;
     }
 
-    /* Padding provides dedicated space so the drop shadow is never clipped */
+    /* Body fits the full iframe height cleanly with breathing room for the drop shadow */
     body {
       font-family: var(--font-main);
       background: #ffffff !important;
       color: var(--color-text-dark) !important;
       margin: 0 !important;
-      padding: 8px 12px 14px 12px !important;
+      padding: 8px 12px 12px 12px !important;
       width: 100% !important;
-      height: auto !important;
-      min-height: 0 !important;
+      height: 100% !important;
+      min-height: 100% !important;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -79,12 +79,13 @@
       outline-offset: 2px;
     }
 
-    /* CONTAINER - Drop shadow visible without hitting frame boundaries */
+    /* CONTAINER - Fills full iframe height so no bottom gap is created */
     .interactive-container {
       width: 100%;
       max-width: 1120px;
+      height: 100%;
+      max-height: calc(100vh - 20px);
       margin: 0 auto;
-      aspect-ratio: 16 / 9;
       background: #ffffff;
       border-radius: 8px;
       box-shadow: var(--mb-shadow-frame);
@@ -93,7 +94,7 @@
       transform: translateZ(0);
       container-type: inline-size;
       container-name: app;
-      flex-shrink: 0;
+      flex: 1 1 auto;
     }
 
     /* ========================================================= */
@@ -1019,22 +1020,19 @@
     function reportHeightToParent() {
       const app = document.getElementById('interactive-app');
       if (!app) return;
-      // Exact outer pixel height including shadow margins
-      const exactHeight = Math.ceil(app.getBoundingClientRect().height) + 22;
+      const exactHeight = Math.ceil(app.getBoundingClientRect().height) + 20;
 
-      // 1. Standard Moodle LTI / window.parent protocols
+      // Standard Moodle / LTI frameResize message
       const ltiMsg = { subject: 'lti.frameResize', height: exactHeight, frameHeight: exactHeight };
       window.parent.postMessage(ltiMsg, '*');
       window.parent.postMessage(JSON.stringify(ltiMsg), '*');
 
-      // 2. Comprehensive LMS resize signatures
       window.parent.postMessage({ type: 'resize', height: exactHeight, value: exactHeight, frameHeight: exactHeight }, '*');
       window.parent.postMessage({ type: 'setHeight', height: exactHeight }, '*');
       window.parent.postMessage({ event: 'resize', height: exactHeight }, '*');
       window.parent.postMessage('resize::' + exactHeight, '*');
       window.parent.postMessage({ 'height': exactHeight }, '*');
 
-      // 3. iFrameResizer client API if embedded by Moodle filter
       if (window.parentIFrame && typeof window.parentIFrame.size === 'function') {
         window.parentIFrame.size(exactHeight);
       }
@@ -1049,6 +1047,7 @@
       if (d <= r) return [[cx, cy], [cx, cy]];
       const a = Math.atan2(dy, dx);
       const o = Math.asin(r / d);
+      const l = Math.sqrt(d * d - r * r);
       return [a - o, a + o].map(t => [px + l * Math.cos(t), py + l * Math.sin(t)]);
     }
 
@@ -1073,7 +1072,6 @@
       circle.style.setProperty('--cx', cx + 'px');
       circle.style.setProperty('--cy', cy + 'px');
 
-      // Bound card within container
       const maxCardH = app.offsetHeight - 24;
       card.style.maxHeight = maxCardH + 'px';
 
@@ -1091,7 +1089,6 @@
         }
       }
 
-      // Calculate wedge corners and tangent lines
       const r = circle.offsetWidth / 2 - 1;
       const p2 = [card.offsetLeft + card.offsetWidth, card.offsetTop + card.offsetHeight];
       const cardAboveCircle = card.offsetTop < cy - r;
@@ -1145,7 +1142,6 @@
       circle.style.setProperty('--cy', cy + 'px');
     }
 
-    // Handles Moodle drawer toggles and real-time resizing
     const resizeObserver = new ResizeObserver(() => {
       reportHeightToParent();
       if (contentModal.classList.contains('active') && activePin) {
@@ -1156,7 +1152,6 @@
 
     window.addEventListener('load', () => {
       reportHeightToParent();
-      // Ensure height is synchronized after SVGs and resources finish settling
       setTimeout(reportHeightToParent, 200);
       setTimeout(reportHeightToParent, 600);
     });
