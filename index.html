@@ -35,23 +35,26 @@
       padding: 0;
     }
 
-    /* ELIMINATE IFRAME SCROLLBAR COMPLETELY */
+    /* ELIMINATE IFRAME SCROLLBAR AND PREVENT TOP/BOTTOM GAPS */
     html, body {
       background: #ffffff !important;
       color: var(--color-text-dark) !important;
       width: 100% !important;
-      height: 100% !important;
       margin: 0 !important;
       padding: 0 !important;
-      overflow: hidden !important;
+      overflow-x: hidden !important;
+      overflow-y: hidden !important;
+      height: auto !important;
+      min-height: 0 !important;
       -webkit-font-smoothing: antialiased;
     }
 
     body {
       font-family: var(--font-main);
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: flex-start;
     }
 
     .sr-only {
@@ -71,11 +74,11 @@
       outline-offset: 2px;
     }
 
-    /* CONTAINER - Fits perfectly within iframe without overflowing */
+    /* CONTAINER - Responsive container query context */
     .interactive-container {
-      width: min(100%, calc(100vh * 16 / 9));
+      width: 100%;
       max-width: 1120px;
-      max-height: 100%;
+      margin: 0 auto;
       aspect-ratio: 16 / 9;
       background: #ffffff;
       border-radius: 8px;
@@ -83,10 +86,12 @@
       position: relative;
       overflow: hidden;
       transform: translateZ(0);
+      container-type: inline-size;
+      container-name: app;
     }
 
     /* ========================================================= */
-    /* 1. COVER SLIDE STYLES                                     */
+    /* 1. COVER SLIDE STYLES (FLUID SCALING PREVENTS SIDE CUTOFF)*/
     /* ========================================================= */
     .view-cover {
       position: absolute;
@@ -95,9 +100,10 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: clamp(1.5rem, 4vw, 4rem) clamp(2rem, 5vw, 6rem);
+      padding: clamp(1rem, 4.5cqi, 3.5rem) clamp(1.25rem, 5.5cqi, 5rem);
       z-index: 500;
       transition: opacity 0.4s ease, visibility 0.4s ease;
+      gap: clamp(1rem, 2cqi, 2.5rem);
     }
 
     .view-cover.hidden {
@@ -107,15 +113,16 @@
     }
 
     .cover-content {
-      max-width: 460px;
+      flex: 1 1 52%;
+      max-width: 55%;
       display: flex;
       flex-direction: column;
-      gap: clamp(1rem, 2.5vw, 2rem);
+      gap: clamp(0.75rem, 2.5cqi, 2rem);
       z-index: 2;
     }
 
     .cover-title {
-      font-size: clamp(28px, 4.2vw, 48px);
+      font-size: clamp(24px, 4.2cqi, 48px);
       font-weight: 700;
       color: #000000;
       line-height: 1.2;
@@ -130,8 +137,8 @@
       background-color: #2E45B8;
       color: #ffffff;
       border: none;
-      padding: clamp(0.55rem, 1.2vw, 0.75rem) clamp(1.75rem, 3vw, 2.5rem);
-      font-size: clamp(0.85rem, 1.2vw, 1rem);
+      padding: clamp(0.5rem, 1.2cqi, 0.75rem) clamp(1.5rem, 3cqi, 2.5rem);
+      font-size: clamp(0.85rem, 1.2cqi, 1rem);
       font-family: var(--font-main);
       font-weight: 700;
       border-radius: 4px;
@@ -149,7 +156,8 @@
     }
 
     .cover-illustration {
-      width: 45%;
+      flex: 1 1 42%;
+      max-width: 44%;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -157,9 +165,11 @@
 
     .cover-illustration img {
       width: 100%;
-      max-width: clamp(180px, 30vw, 360px);
+      max-width: clamp(160px, 32cqi, 360px);
+      max-height: 85%;
       height: auto;
       display: block;
+      object-fit: contain;
     }
 
     @keyframes slideUpFade {
@@ -181,10 +191,10 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: clamp(0.4rem, 1vw, 0.8rem) clamp(1rem, 2vw, 1.75rem);
+      padding: 0 clamp(0.75rem, 2cqi, 1.75rem);
       background: #ffffff;
       border-bottom: 1px solid #e0e0e0;
-      height: 10%;
+      height: clamp(38px, 9.5%, 52px);
     }
 
     .brand-section {
@@ -193,7 +203,7 @@
     }
 
     .sub-title {
-      font-size: clamp(0.82rem, 1.2vw, 0.95rem);
+      font-size: clamp(0.82rem, 1.2cqi, 0.95rem);
       font-weight: 500;
       color: #333333;
     }
@@ -208,8 +218,8 @@
       border: 1.5px solid var(--color-navy-header);
       color: var(--color-navy-header);
       border-radius: 50%;
-      width: clamp(26px, 3vw, 32px);
-      height: clamp(26px, 3vw, 32px);
+      width: clamp(26px, 3cqi, 32px);
+      height: clamp(26px, 3cqi, 32px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -218,8 +228,8 @@
     }
 
     .icon-btn svg {
-      width: clamp(13px, 1.5vw, 16px);
-      height: clamp(13px, 1.5vw, 16px);
+      width: clamp(13px, 1.5cqi, 16px);
+      height: clamp(13px, 1.5cqi, 16px);
     }
 
     .icon-btn:hover, .icon-btn:focus-visible {
@@ -230,7 +240,7 @@
     .stage-view {
       position: relative;
       width: 100%;
-      height: 90%;
+      height: calc(100% - clamp(38px, 9.5%, 52px));
       background-color: #ffffff;
       overflow: hidden;
       perspective: 800px;
@@ -306,7 +316,7 @@
     }
 
     .pin-img {
-      width: clamp(16px, 2.2vw, 21px);
+      width: clamp(16px, 2.2cqi, 21px);
       height: auto;
       filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.3));
       transform-style: preserve-3d;
@@ -369,7 +379,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-end;
-      padding-bottom: clamp(0.75rem, 2vw, 2.25rem);
+      padding-bottom: clamp(0.75rem, 2cqi, 2.25rem);
       transform: translateZ(0);
     }
 
@@ -416,8 +426,8 @@
       top: var(--cy, 33%);
       left: var(--cx, 55.5%);
       transform: translate(-50%, -50%);
-      width: clamp(90px, 12vw, 132px);
-      height: clamp(90px, 12vw, 132px);
+      width: clamp(86px, 12cqi, 132px);
+      height: clamp(86px, 12cqi, 132px);
       border-radius: 50%;
       border: 2px solid #ffffff;
       overflow: hidden;
@@ -441,42 +451,42 @@
       top: 53.1%;
       left: 50.8%;
       transform: translate(-50%, -100%);
-      width: clamp(14px, 1.8vw, 20px);
+      width: clamp(14px, 1.8cqi, 20px);
       height: auto;
       z-index: 335;
       filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.4));
     }
 
-    /* DIALOG CARD - SCROLLABLE AND FLUID */
+    /* DIALOG CARD - ADAPTIVE SCROLLING PREVENTS TOP CUTOFF */
     .dialog-card {
       background: #ffffff;
       border-radius: 0;
       width: 960px;
       max-width: 92%;
-      padding: clamp(0.75rem, 1.8vw, 1.5rem) clamp(1rem, 2.5vw, 2.25rem);
+      padding: clamp(0.75rem, 1.8cqi, 1.5rem) clamp(1rem, 2.5cqi, 2.25rem);
       box-shadow: 0 10px 30px rgba(0,0,0,0.3);
       position: relative;
       z-index: 315;
       display: flex;
       flex-direction: column;
-      max-height: calc(100% - 1.5rem);
+      max-height: calc(100% - 1.25rem);
       box-sizing: border-box;
     }
 
     .dialog-card h2 {
-      font-size: clamp(0.95rem, 1.8vw, 1.35rem);
+      font-size: clamp(0.92rem, 1.6cqi, 1.35rem);
       color: var(--color-text-dark);
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
       font-weight: 700;
       border-bottom: 1px solid #eaeaea;
-      padding-bottom: 0.4rem;
+      padding-bottom: 0.35rem;
       padding-right: 2.2rem;
       flex-shrink: 0;
-      line-height: 1.3;
+      line-height: 1.25;
     }
 
     .dialog-card p {
-      font-size: clamp(0.75rem, 1.15vw, 0.88rem);
+      font-size: clamp(0.72rem, 1.1cqi, 0.88rem);
       color: #333;
       line-height: 1.5;
       overflow-y: auto;
@@ -487,13 +497,13 @@
 
     .close-card-btn {
       position: absolute;
-      top: 0.75rem;
-      right: 0.75rem;
+      top: 0.65rem;
+      right: 0.65rem;
       background: #ffffff;
       border: 1.5px solid var(--color-primary-blue);
       border-radius: 50%;
-      width: clamp(26px, 2.5vw, 32px);
-      height: clamp(26px, 2.5vw, 32px);
+      width: clamp(26px, 2.5cqi, 32px);
+      height: clamp(26px, 2.5cqi, 32px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -518,25 +528,25 @@
 
     .spotlight-view-container.layout-left .dialog-card {
       position: absolute;
-      left: 5%;
-      bottom: 18%;
-      width: 44%;
+      left: 4.5%;
+      bottom: 16%;
+      width: 45%;
       max-width: none;
       transition: none !important;
     }
 
     .spotlight-view-container.layout-left.card-wide .dialog-card {
-      width: 46%;
-      bottom: 14%;
+      width: 47%;
+      bottom: 13%;
     }
 
     .spotlight-view-container.layout-left.card-wider .dialog-card {
       width: 52%;
-      bottom: 10%;
+      bottom: 9%;
     }
 
     .spotlight-view-container.layout-left.wedge-outer .dialog-card {
-      bottom: 10%;
+      bottom: 9%;
     }
 
     .spotlight-view-container.layout-left .spotlight-beam {
@@ -572,7 +582,7 @@
     .center-modal {
       background: #ffffff;
       border-radius: 0;
-      padding: clamp(1.75rem, 3.5vw, 3rem) clamp(1.25rem, 3vw, 3.25rem) clamp(1.25rem, 2.5vw, 2rem);
+      padding: clamp(1.75rem, 3.5cqi, 3rem) clamp(1.25rem, 3cqi, 3.25rem) clamp(1.25rem, 2.5cqi, 2rem);
       text-align: center;
       width: 90%;
       max-width: 760px;
@@ -588,8 +598,8 @@
       top: -36px;
       left: 50%;
       transform: translateX(-50%);
-      width: clamp(64px, 8vw, 84px);
-      height: clamp(64px, 8vw, 84px);
+      width: clamp(64px, 8cqi, 84px);
+      height: clamp(64px, 8cqi, 84px);
       border-radius: 50%;
       box-shadow: 0 4px 14px rgba(0,0,0,0.2);
       z-index: 10;
@@ -598,9 +608,9 @@
     }
 
     .center-modal h2 {
-      font-size: clamp(0.82rem, 1.25vw, 0.95rem);
+      font-size: clamp(0.82rem, 1.25cqi, 0.95rem);
       color: #222222;
-      margin-bottom: clamp(1rem, 2vw, 1.5rem);
+      margin-bottom: clamp(1rem, 2cqi, 1.5rem);
       font-weight: 400;
       line-height: 1.55;
     }
@@ -611,7 +621,7 @@
       border: none;
       padding: 0.6rem 2.2rem;
       border-radius: 4px;
-      font-size: clamp(0.82rem, 1.1vw, 0.95rem);
+      font-size: clamp(0.82rem, 1.1cqi, 0.95rem);
       font-weight: 700;
       cursor: pointer;
       transition: background-color 0.2s ease, transform 0.15s ease;
@@ -624,13 +634,13 @@
 
     .completion-card {
       max-width: 540px;
-      padding: clamp(1.5rem, 3vw, 2.5rem);
+      padding: clamp(1.5rem, 3cqi, 2.5rem);
       position: relative;
     }
 
     .completion-illustration {
       width: 100%;
-      max-width: clamp(180px, 25vw, 260px);
+      max-width: clamp(180px, 25cqi, 260px);
       height: auto;
       margin: 0 auto 1.2rem;
       display: block;
@@ -665,7 +675,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: clamp(0.75rem, 2vw, 1.5rem);
+      padding: clamp(0.75rem, 2cqi, 1.5rem);
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
@@ -681,7 +691,7 @@
       border-radius: 0;
       width: min(780px, 90%);
       max-height: 88%;
-      padding: clamp(1rem, 2.5vw, 1.75rem) clamp(1.25rem, 3vw, 2.5rem);
+      padding: clamp(1rem, 2.5cqi, 1.75rem) clamp(1.25rem, 3cqi, 2.5rem);
       display: flex;
       flex-direction: column;
       position: relative;
@@ -694,7 +704,7 @@
     }
 
     .bib-head h2 {
-      font-size: clamp(15px, 1.8vw, 18px);
+      font-size: clamp(15px, 1.8cqi, 18px);
       font-weight: 700;
       color: var(--ink);
       margin: 0 0 12px;
@@ -704,7 +714,7 @@
     .bib-body {
       padding: 12px 6px 12px 0;
       overflow-y: auto;
-      font-size: clamp(12.5px, 1.3vw, 15px);
+      font-size: clamp(12.5px, 1.3cqi, 15px);
       line-height: 1.6;
       color: var(--ink);
       font-weight: 400;
@@ -728,22 +738,19 @@
       }
     }
 
-    /* Constrained Sidebar Responsive Adaptations */
-    @media (max-width: 850px) {
+    /* Container Queries for Narrow Moodle Panels */
+    @container app (max-width: 780px) {
       .spotlight-view-container.layout-left .dialog-card,
       .spotlight-view-container.layout-left.card-wide .dialog-card,
       .spotlight-view-container.layout-left.card-wider .dialog-card {
         width: 48%;
-        left: 3%;
+        left: 2.5%;
       }
     }
 
-    @media (max-width: 680px) {
-      .view-cover { flex-direction: column-reverse; padding: 1.5rem 1rem; gap: 1rem; justify-content: center; }
-      .cover-content { align-items: center; text-align: center; }
-      .cover-title { font-size: 26px; }
-      .btn-start { align-self: center; }
-      .cover-illustration { width: 55%; }
+    @container app (max-width: 640px) {
+      .cover-content { max-width: 58%; }
+      .cover-illustration { max-width: 38%; }
       .spotlight-view-container.layout-left .dialog-card,
       .spotlight-view-container.layout-left.card-wide .dialog-card,
       .spotlight-view-container.layout-left.card-wider .dialog-card {
@@ -1000,6 +1007,19 @@
       if (srStatus) srStatus.textContent = message;
     }
 
+    // Dynamic height reporter for parent Moodle iframe
+    function reportHeightToParent() {
+      const app = document.getElementById('interactive-app');
+      if (!app) return;
+      const height = Math.ceil(app.getBoundingClientRect().height);
+      
+      // Standard messages received by Moodle & iFrame-resizer
+      window.parent.postMessage({ frameHeight: height, height: height, type: 'resize' }, '*');
+      window.parent.postMessage({ type: 'setHeight', height: height }, '*');
+      window.parent.postMessage('resize::' + height, '*');
+      window.parent.postMessage({ event: 'resize', height: height }, '*');
+    }
+
     function tangentPoints(px, py, cx, cy, r) {
       const dx = cx - px, dy = cy - py;
       const d = Math.hypot(dx, dy);
@@ -1031,22 +1051,20 @@
       circle.style.setProperty('--cx', cx + 'px');
       circle.style.setProperty('--cy', cy + 'px');
 
-      // Keep card bounded within the container height
+      // Bound card within container
       const maxCardH = app.offsetHeight - 24;
       card.style.maxHeight = maxCardH + 'px';
 
       if (spotlightContainer.classList.contains('anchor-card')) {
         let top = Math.min(cy - 0.17 * circle.offsetWidth, app.offsetHeight - 12 - card.offsetHeight);
-        if (top < 12) top = 12;
+        if (top < 10) top = 10;
         card.style.top = top + 'px';
         card.style.bottom = 'auto';
       } else {
         card.style.top = '';
         card.style.bottom = '';
-        // If bottom alignment pushes card above the top boundary, clamp it down
-        const cardTop = card.offsetTop;
-        if (cardTop < 12) {
-          card.style.top = '12px';
+        if (card.offsetTop < 10) {
+          card.style.top = '10px';
           card.style.bottom = 'auto';
         }
       }
@@ -1090,7 +1108,7 @@
 
       card.style.top = '';
       card.style.bottom = '';
-      card.style.maxHeight = (app.offsetHeight - 50) + 'px';
+      card.style.maxHeight = (app.offsetHeight - 40) + 'px';
       stack.style.transform = '';
 
       const gap = pin.offsetHeight - pinImg.offsetHeight;
@@ -1105,15 +1123,18 @@
       circle.style.setProperty('--cy', cy + 'px');
     }
 
-    // Handles Moodle drawer toggles and resizing
+    // Handles Moodle drawer toggles and real-time resizing
     const resizeObserver = new ResizeObserver(() => {
+      reportHeightToParent();
       if (contentModal.classList.contains('active') && activePin) {
         alignSpotlightToPin(activePin);
       }
     });
     resizeObserver.observe(document.getElementById('interactive-app'));
 
+    window.addEventListener('load', reportHeightToParent);
     window.addEventListener('resize', () => {
+      reportHeightToParent();
       if (contentModal.classList.contains('active') && activePin) alignSpotlightToPin(activePin);
     });
 
