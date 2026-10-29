@@ -33,24 +33,25 @@
       padding: 0;
     }
 
-    /* ELIMINATE IFRAME SCROLLBAR */
+    /* ELIMINATE IFRAME SCROLLBAR AND EXPAND TO MATCH MOODLE IFRAME */
     html {
       background: #ffffff !important;
       color: var(--color-text-dark) !important;
       overflow: hidden !important;
       width: 100% !important;
-      height: auto !important;
+      height: 100% !important;
     }
 
+    /* Padding reserves dedicated buffer for the drop shadow */
     body {
       font-family: var(--font-main);
       background: #ffffff !important;
       color: var(--color-text-dark) !important;
       margin: 0 !important;
-      padding: 6px 10px 10px 10px !important;
+      padding: 8px 12px 14px 12px !important;
       width: 100% !important;
-      height: auto !important;
-      min-height: 0 !important;
+      height: 100% !important;
+      min-height: 100% !important;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -76,11 +77,12 @@
       outline-offset: 2px;
     }
 
-    /* CONTAINER - Locked 16/9 ratio ensures map pins never drift */
+    /* CONTAINER - Fills full iframe height so bottom gap is eliminated */
     .interactive-container {
       width: 100%;
       max-width: 1120px;
-      aspect-ratio: 16 / 9;
+      height: calc(100vh - 22px);
+      min-height: 100%;
       margin: 0 auto;
       background: #ffffff;
       border-radius: 8px;
@@ -90,7 +92,8 @@
       transform: translateZ(0);
       container-type: inline-size;
       container-name: app;
-      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
     }
 
     /* ========================================================= */
@@ -198,6 +201,7 @@
       background: #ffffff;
       border-bottom: 1px solid #e0e0e0;
       height: clamp(38px, 9.5%, 52px);
+      flex-shrink: 0;
     }
 
     .brand-section {
@@ -243,17 +247,32 @@
     .stage-view {
       position: relative;
       width: 100%;
-      height: calc(100% - clamp(38px, 9.5%, 52px));
+      flex: 1 1 auto;
       background-color: #ffffff;
       overflow: hidden;
       perspective: 800px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* MAP AREA - Locked aspect ratio ensures pins NEVER drift */
+    .map-area {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 8.1;
+      max-height: 100%;
+      max-width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .world-map-svg {
       width: 100%;
       height: 100%;
       display: block;
-      object-fit: fill; /* fill keeps exact mathematical alignment with % pin coordinates */
+      object-fit: fill;
     }
 
     .map-highlights {
@@ -808,51 +827,53 @@
     </header>
 
     <main class="stage-view">
-      <!-- BASE MAP -->
-      <img src="Resources/PastedVector-16.svg" id="main-world-map" alt="World Map" class="world-map-svg">
+      <div class="map-area" id="map-area">
+        <!-- BASE MAP -->
+        <img src="Resources/PastedVector-16.svg" id="main-world-map" alt="World Map" class="world-map-svg">
 
-      <!-- HOVER HIGHLIGHTS -->
-      <svg class="map-highlights" viewBox="0 0 1112.8 498.4" preserveAspectRatio="none" aria-hidden="true">
-        <defs>
-          <filter id="tint-southchina" color-interpolation-filters="sRGB">
-            <feFlood flood-color="#475ED1" result="c"/>
-            <feComposite in="c" in2="SourceAlpha" operator="in"/>
-          </filter>
-        </defs>
-        <image id="hl-ukraine"    class="map-hl" href="Resources/PastedVector-18.svg" x="589.3" y="96.7"  width="52.1" height="29.2"/>
-        <image id="hl-turkey"     class="map-hl" href="Resources/PastedVector-19.svg" x="603.3" y="134.3" width="60.2" height="23.6"/>
-        <image id="hl-syria"      class="map-hl" href="Resources/PastedVector-20.svg" x="634.5" y="153"   width="20"   height="19"/>
-        <image id="hl-georgia"    class="map-hl" href="Resources/PastedVector-21.svg" x="651"   y="133.5" width="22.1" height="9.5"/>
-        <image id="hl-yemen"      class="map-hl" href="Resources/PastedVector-22.svg" x="664.5" y="219.8" width="34.1" height="24.2"/>
-        <image id="hl-indiachina" class="map-hl" href="Resources/PastedVector-23.svg" x="769"   y="155.6" width="15.5" height="20.4"/>
-        <image id="hl-southchina" class="map-hl" href="Resources/PastedVector-28.svg" x="875.8" y="189"   width="54.6" height="84.1" filter="url(#tint-southchina)"/>
-        
-        <!-- Leader Line for India-China -->
-        <image id="leader-indiachina" class="map-leader" href="Resources/PastedVector-27.svg" x="773.8" y="156.8" width="4.7" height="7.2"/>
-      </svg>
+        <!-- HOVER HIGHLIGHTS -->
+        <svg class="map-highlights" viewBox="0 0 1112.8 498.4" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <filter id="tint-southchina" color-interpolation-filters="sRGB">
+              <feFlood flood-color="#475ED1" result="c"/>
+              <feComposite in="c" in2="SourceAlpha" operator="in"/>
+            </filter>
+          </defs>
+          <image id="hl-ukraine"    class="map-hl" href="Resources/PastedVector-18.svg" x="589.3" y="96.7"  width="52.1" height="29.2"/>
+          <image id="hl-turkey"     class="map-hl" href="Resources/PastedVector-19.svg" x="603.3" y="134.3" width="60.2" height="23.6"/>
+          <image id="hl-syria"      class="map-hl" href="Resources/PastedVector-20.svg" x="634.5" y="153"   width="20"   height="19"/>
+          <image id="hl-georgia"    class="map-hl" href="Resources/PastedVector-21.svg" x="651"   y="133.5" width="22.1" height="9.5"/>
+          <image id="hl-yemen"      class="map-hl" href="Resources/PastedVector-22.svg" x="664.5" y="219.8" width="34.1" height="24.2"/>
+          <image id="hl-indiachina" class="map-hl" href="Resources/PastedVector-23.svg" x="769"   y="155.6" width="15.5" height="20.4"/>
+          <image id="hl-southchina" class="map-hl" href="Resources/PastedVector-28.svg" x="875.8" y="189"   width="54.6" height="84.1" filter="url(#tint-southchina)"/>
+          
+          <!-- Leader Line for India-China -->
+          <image id="leader-indiachina" class="map-leader" href="Resources/PastedVector-27.svg" x="773.8" y="156.8" width="4.7" height="7.2"/>
+        </svg>
 
-      <!-- Map Pins -->
-      <button class="pin-btn pin-ukraine" data-id="ukraine" aria-label="Ukraine Conflict">
-        <img src="Resources/PastedVector-25.svg" alt="" aria-hidden="true" class="pin-img">
-      </button>
-      <button class="pin-btn pin-turkey" data-id="turkey" aria-label="Turkey Intervention">
-        <img src="Resources/PastedVector-25.svg" alt="" aria-hidden="true" class="pin-img">
-      </button>
-      <button class="pin-btn pin-syria" data-id="syria" aria-label="Syria Red Line">
-        <img src="Resources/PastedVector-25.svg" alt="" aria-hidden="true" class="pin-img">
-      </button>
-      <button class="pin-btn pin-georgia" data-id="georgia" aria-label="Georgia War">
-        <img src="Resources/PastedVector-25.svg" alt="" aria-hidden="true" class="pin-img">
-      </button>
-      <button class="pin-btn pin-yemen" data-id="yemen" aria-label="Yemen Crisis">
-        <img src="Resources/PastedVector-25.svg" alt="" aria-hidden="true" class="pin-img">
-      </button>
-      <button class="pin-btn pin-indiachina" data-id="indiachina" aria-label="India-China Conflict">
-        <img src="Resources/PastedVector-25.svg" alt="" aria-hidden="true" class="pin-img">
-      </button>
-      <button class="pin-btn pin-southchina" data-id="southchina" aria-label="South China Sea">
-        <img src="Resources/PastedVector-25.svg" alt="" aria-hidden="true" class="pin-img">
-      </button>
+        <!-- Map Pins -->
+        <button class="pin-btn pin-ukraine" data-id="ukraine" aria-label="Ukraine Conflict">
+          <img src="Resources/PastedVector-25.svg" alt="" aria-hidden="true" class="pin-img">
+        </button>
+        <button class="pin-btn pin-turkey" data-id="turkey" aria-label="Turkey Intervention">
+          <img src="Resources/PastedVector-25.svg" alt="" aria-hidden="true" class="pin-img">
+        </button>
+        <button class="pin-btn pin-syria" data-id="syria" aria-label="Syria Red Line">
+          <img src="Resources/PastedVector-25.svg" alt="" aria-hidden="true" class="pin-img">
+        </button>
+        <button class="pin-btn pin-georgia" data-id="georgia" aria-label="Georgia War">
+          <img src="Resources/PastedVector-25.svg" alt="" aria-hidden="true" class="pin-img">
+        </button>
+        <button class="pin-btn pin-yemen" data-id="yemen" aria-label="Yemen Crisis">
+          <img src="Resources/PastedVector-25.svg" alt="" aria-hidden="true" class="pin-img">
+        </button>
+        <button class="pin-btn pin-indiachina" data-id="indiachina" aria-label="India-China Conflict">
+          <img src="Resources/PastedVector-25.svg" alt="" aria-hidden="true" class="pin-img">
+        </button>
+        <button class="pin-btn pin-southchina" data-id="southchina" aria-label="South China Sea">
+          <img src="Resources/PastedVector-25.svg" alt="" aria-hidden="true" class="pin-img">
+        </button>
+      </div>
     </main>
 
     <!-- INTRO OVERLAY MODAL -->
@@ -1012,30 +1033,6 @@
       if (srStatus) srStatus.textContent = message;
     }
 
-    // Dynamic height reporter for parent Moodle iframe
-    function reportHeightToParent() {
-      const app = document.getElementById('interactive-app');
-      if (!app) return;
-      const exactHeight = Math.ceil(app.getBoundingClientRect().height) + 16;
-
-      const ltiMsg = { subject: 'lti.frameResize', height: exactHeight, frameHeight: exactHeight };
-      window.parent.postMessage(ltiMsg, '*');
-      window.parent.postMessage(JSON.stringify(ltiMsg), '*');
-
-      window.parent.postMessage({ type: 'resize', height: exactHeight, value: exactHeight, frameHeight: exactHeight }, '*');
-      window.parent.postMessage({ type: 'setHeight', height: exactHeight }, '*');
-      window.parent.postMessage({ event: 'resize', height: exactHeight }, '*');
-      window.parent.postMessage('resize::' + exactHeight, '*');
-      window.parent.postMessage({ 'height': exactHeight }, '*');
-
-      if (window.parentIFrame && typeof window.parentIFrame.size === 'function') {
-        window.parentIFrame.size(exactHeight);
-      }
-      if (window.parent && window.parent.iFrameResizer && typeof window.parent.iFrameResizer.resize === 'function') {
-        window.parent.iFrameResizer.resize();
-      }
-    }
-
     function tangentPoints(px, py, cx, cy, r) {
       const dx = cx - px, dy = cy - py;
       const d = Math.hypot(dx, dy);
@@ -1048,7 +1045,6 @@
 
     function alignLeftLayout(pin) {
       const app = document.getElementById('interactive-app');
-      const stage = document.querySelector('.stage-view');
       const stack = document.getElementById('spotlight-stack');
       const circle = document.getElementById('spotlight-circle');
       const card = document.querySelector('.dialog-card');
@@ -1058,9 +1054,12 @@
 
       stack.style.transform = '';
 
-      const gap = pin.offsetHeight - pinImg.offsetHeight;
-      const tipX = stage.offsetLeft + pin.offsetLeft;
-      const tipY = stage.offsetTop + pin.offsetTop - gap;
+      // Direct exact sub-pixel positioning
+      const appRect = app.getBoundingClientRect();
+      const pinImgRect = pinImg.getBoundingClientRect();
+      const tipX = (pinImgRect.left + pinImgRect.width / 2) - appRect.left;
+      const tipY = pinImgRect.bottom - appRect.top;
+
       const size = circle.clientWidth;
       const cx = tipX - (0.508 - 0.5) * size;
       const cy = tipY - (0.531 - 0.5) * size;
@@ -1114,7 +1113,6 @@
       }
 
       const app = document.getElementById('interactive-app');
-      const stage = document.querySelector('.stage-view');
       const stack = document.getElementById('spotlight-stack');
       const circle = document.getElementById('spotlight-circle');
       const card = document.querySelector('.dialog-card');
@@ -1125,9 +1123,11 @@
       card.style.maxHeight = (app.offsetHeight - 40) + 'px';
       stack.style.transform = '';
 
-      const gap = pin.offsetHeight - pinImg.offsetHeight;
-      const tipX = stage.offsetLeft + pin.offsetLeft;
-      const tipY = stage.offsetTop + pin.offsetTop - gap;
+      // Direct exact sub-pixel positioning
+      const appRect = app.getBoundingClientRect();
+      const pinImgRect = pinImg.getBoundingClientRect();
+      const tipX = (pinImgRect.left + pinImgRect.width / 2) - appRect.left;
+      const tipY = pinImgRect.bottom - appRect.top;
 
       const size = circle.offsetWidth || 132;
       const cx = tipX - (0.508 - 0.5) * size;
@@ -1138,21 +1138,13 @@
     }
 
     const resizeObserver = new ResizeObserver(() => {
-      reportHeightToParent();
       if (contentModal.classList.contains('active') && activePin) {
         alignSpotlightToPin(activePin);
       }
     });
     resizeObserver.observe(document.getElementById('interactive-app'));
 
-    window.addEventListener('load', () => {
-      reportHeightToParent();
-      setTimeout(reportHeightToParent, 200);
-      setTimeout(reportHeightToParent, 600);
-    });
-
     window.addEventListener('resize', () => {
-      reportHeightToParent();
       if (contentModal.classList.contains('active') && activePin) alignSpotlightToPin(activePin);
     });
 
@@ -1283,6 +1275,8 @@
     }
 
     document.getElementById('btn-reset').addEventListener('click', resetToCover);
+
+    // Both X buttons return cleanly to the cover screen
     document.getElementById('btn-exit').addEventListener('click', resetToCover);
     document.getElementById('completion-exit-btn').addEventListener('click', resetToCover);
 
